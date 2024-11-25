@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+func ignoreError(_ error) {
+}
+
 func until(f func(), initialPeriod, maxPeriod time.Duration, stopCh <-chan struct{}) {
 	select {
 	case <-stopCh:

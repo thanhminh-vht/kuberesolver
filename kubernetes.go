@@ -113,9 +113,9 @@ func NewInClusterK8sClient() (K8sClient, error) {
 				// original configmap file is removed
 				if event.Op.Has(fsnotify.Remove) || event.Op.Has(fsnotify.Chmod) {
 					// remove watcher since the file is removed
-					watcher.Remove(event.Name)
+					_ = watcher.Remove(event.Name)
 					// add a new watcher pointing to the new symlink/file
-					watcher.Add(serviceAccountToken)
+					_ = watcher.Add(serviceAccountToken)
 					token, err := os.ReadFile(serviceAccountToken)
 					if err == nil {
 						client.setToken(string(token))
@@ -166,7 +166,7 @@ func getEndpoints(client K8sClient, namespace, targetName string) (Endpoints, er
 	if err != nil {
 		return Endpoints{}, err
 	}
-	defer resp.Body.Close()
+	defer ignoreError(resp.Body.Close())
 	if resp.StatusCode != http.StatusOK {
 		return Endpoints{}, fmt.Errorf("invalid response code %d for service %s in namespace %s", resp.StatusCode, targetName, namespace)
 	}
@@ -191,7 +191,7 @@ func watchEndpoints(ctx context.Context, client K8sClient, namespace, targetName
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		defer resp.Body.Close()
+		defer ignoreError(resp.Body.Close())
 		return nil, fmt.Errorf("invalid response code %d for service %s in namespace %s", resp.StatusCode, targetName, namespace)
 	}
 	return newStreamWatcher(resp.Body), nil

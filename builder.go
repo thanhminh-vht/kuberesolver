@@ -94,7 +94,7 @@ func splitServicePortNamespace(hpn string) (service, port, namespace string) {
 
 	// we want to split into the service name, namespace, and whatever else is left
 	// this will support fully qualified service names, e.g. {service-name}.<namespace>.svc.<cluster-domain-name>.
-	// Note that since we lookup the endpoints by service name and namespace, we don't care about the
+	// Note that since we look up the endpoints by service name and namespace, we don't care about the
 	// cluster-domain-name, only that we can parse out the service name and namespace properly.
 	parts := strings.SplitN(service, ".", 3)
 	if len(parts) >= 2 {
@@ -144,7 +144,7 @@ func parseResolverTarget(target resolver.Target) (targetInfo, error) {
 //
 // gRPC dial calls Build synchronously, and fails if the returned error is
 // not nil.
-func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, _ resolver.BuildOptions) (resolver.Resolver, error) {
 	if b.k8sClient == nil {
 		if cl, err := NewInClusterK8sClient(); err == nil {
 			b.k8sClient = cl
@@ -243,7 +243,6 @@ func (k *kResolver) makeAddresses(e Endpoints) ([]resolver.Address, string) {
 			newAddrs = append(newAddrs, resolver.Address{
 				Addr:       net.JoinHostPort(address.IP, port),
 				ServerName: fmt.Sprintf("%s.%s", k.target.serviceName, k.target.serviceNamespace),
-				Metadata:   nil,
 			})
 		}
 	}
@@ -253,7 +252,7 @@ func (k *kResolver) makeAddresses(e Endpoints) ([]resolver.Address, string) {
 func (k *kResolver) handle(e Endpoints) {
 	addrs, _ := k.makeAddresses(e)
 	if len(addrs) > 0 {
-		k.cc.UpdateState(resolver.State{
+		_ = k.cc.UpdateState(resolver.State{
 			Addresses: addrs,
 		})
 		k.lastUpdateUnix.Set(float64(time.Now().Unix()))

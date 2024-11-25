@@ -10,12 +10,12 @@ import (
 
 // Interface can be implemented by anything that knows how to watch and report changes.
 type watchInterface interface {
-	// Stops watching. Will close the channel returned by ResultChan(). Releases
+	// Stop Stops watching. Will close the channel returned by ResultChan(). Releases
 	// any resources used by the watch.
 	Stop()
 
-	// Returns a chan which will receive all the events. If an error occurs
-	// or Stop() is called, this channel will be closed, in which case the
+	// ResultChan Returns a chan which will receive all the events. If an error
+	// occurs or Stop() is called, this channel will be closed, in which case the
 	// watch should be completely cleaned up.
 	ResultChan() <-chan Event
 }
@@ -52,7 +52,7 @@ func (sw *streamWatcher) Stop() {
 	defer sw.Unlock()
 	if !sw.stopped {
 		sw.stopped = true
-		sw.r.Close()
+		_ = sw.r.Close()
 	}
 }
 

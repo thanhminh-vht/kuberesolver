@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"sync"
-
-	"google.golang.org/grpc/grpclog"
 )
 
 // Interface can be implemented by anything that knows how to watch and report changes.
@@ -82,9 +80,9 @@ func (sw *streamWatcher) receive() {
 			case context.Canceled:
 				// canceled normally
 			case io.ErrUnexpectedEOF:
-				grpclog.Infof("kuberesolver: Unexpected EOF during watch stream event decoding: %v", err)
+				LoggerPrintFunc("kuberesolver: Unexpected EOF during watch stream event decoding: %v", err)
 			default:
-				grpclog.Infof("kuberesolver: Unable to decode an event from the watch stream: %v", err)
+				LoggerPrintFunc("kuberesolver: Unable to decode an event from the watch stream: %v", err)
 			}
 			return
 		}

@@ -12,7 +12,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -178,7 +177,7 @@ func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts
 		r.wg.Add(1)
 		err := r.watch()
 		if err != nil && err != io.EOF {
-			grpclog.Errorf("kuberesolver: watching ended with error='%v', will reconnect again", err)
+			LoggerPrintFunc("kuberesolver: watching ended with error='%v', will reconnect again", err)
 		}
 	}, time.Second, time.Second*30, ctx.Done())
 	return r, nil
@@ -269,7 +268,7 @@ func (k *kResolver) resolve() {
 	if err == nil {
 		k.handle(e)
 	} else {
-		grpclog.Errorf("kuberesolver: lookup endpoints failed: %v", err)
+		LoggerPrintFunc("kuberesolver: lookup endpoints failed: %v", err)
 	}
 	// Next lookup should happen after an interval defined by k.freq.
 	k.t.Reset(k.freq)

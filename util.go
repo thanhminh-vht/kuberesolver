@@ -3,8 +3,6 @@ package kuberesolver
 import (
 	"runtime/debug"
 	"time"
-
-	"google.golang.org/grpc/grpclog"
 )
 
 func until(f func(), initialPeriod, maxPeriod time.Duration, stopCh <-chan struct{}) {
@@ -36,6 +34,6 @@ func until(f func(), initialPeriod, maxPeriod time.Duration, stopCh <-chan struc
 func handleCrash() {
 	if r := recover(); r != nil {
 		callers := string(debug.Stack())
-		grpclog.Errorf("kuberesolver: recovered from panic: %#v (%v)\n%v", r, r, callers)
+		LoggerPrintFunc("kuberesolver: recovered from panic: %#v (%v)\n%v", r, r, callers)
 	}
 }
